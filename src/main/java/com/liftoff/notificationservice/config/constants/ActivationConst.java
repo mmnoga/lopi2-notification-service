@@ -5,8 +5,6 @@ public final class ActivationConst {
     private ActivationConst() {
     }
 
-    public static final String ACTIVATION_LINK_BASE =
-            "http://frontend.page/";
     public static final String ACTIVATION_PATH =
             "activate";
     public static final String ACTIVATION_SUBJECT_TEMPLATE =
