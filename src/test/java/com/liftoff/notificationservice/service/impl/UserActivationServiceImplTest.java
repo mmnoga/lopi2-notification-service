@@ -41,14 +41,14 @@ class UserActivationServiceImplTest {
                 new ActivationUserData("encodedEmail", "token");
         String decodedEmail = "test@test.com";
 
-        when(encoderService.decodeBase64(activationUserData.getEncodedEmail())).thenReturn(decodedEmail);
+        when(encoderService.decodeBase64(activationUserData.getEncodedUsername())).thenReturn(decodedEmail);
 
         // when
         userActivationService.sendActivationLink(activationUserData);
 
         // then
         verify(encoderService, times(1))
-                .decodeBase64(activationUserData.getEncodedEmail());
+                .decodeBase64(activationUserData.getEncodedUsername());
         verify(mailService, times(1))
                 .sendEmail(eq(decodedEmail), anyString(), anyString());
     }
@@ -59,7 +59,7 @@ class UserActivationServiceImplTest {
         ActivationUserData activationUserData =
                 new ActivationUserData("encodedEmail", "token");
         String decodedEmail = "test@test.com";
-        when(encoderService.decodeBase64(activationUserData.getEncodedEmail())).thenReturn(decodedEmail);
+        when(encoderService.decodeBase64(activationUserData.getEncodedUsername())).thenReturn(decodedEmail);
         doThrow(new MessagingException("Test MessagingException"))
                 .when(mailService).sendEmail(eq(decodedEmail), anyString(), anyString());
 

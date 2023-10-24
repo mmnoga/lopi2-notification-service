@@ -5,8 +5,6 @@ public final class ActivationConst {
     private ActivationConst() {
     }
 
-    public static final String ACTIVATION_PATH =
-            "activate";
     public static final String ACTIVATION_SUBJECT_TEMPLATE =
             "User Account Activation";
     public static final String ACTIVATION_BODY_HEADER_TEMPLATE =

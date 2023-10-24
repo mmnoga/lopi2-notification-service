@@ -21,14 +21,17 @@ public class UserActivationServiceImpl implements UserActivationService {
     private final MailService mailService;
     private final EncoderService encoderService;
     private final String activationLinkBase;
+    private final String activationPath;
 
     public UserActivationServiceImpl(
             MailService mailService,
             EncoderService encoderService,
-            @Value("${user.register.activation-link-base}") String activationLinkBase) {
+            @Value("${user.register.activation-link-base}") String activationLinkBase,
+            @Value("${user.register.activation-path}") String activationPath) {
         this.mailService = mailService;
         this.encoderService = encoderService;
         this.activationLinkBase = activationLinkBase;
+        this.activationPath = activationPath;
     }
 
     @Override
@@ -38,12 +41,11 @@ public class UserActivationServiceImpl implements UserActivationService {
             throw new BusinessException("activationUserData cannot be null", HttpStatus.BAD_REQUEST);
         }
 
-        String encodedEmail = activationUserData.getEncodedEmail();
+        String encodedEmail = activationUserData.getEncodedUsername();
+        String token = activationUserData.getTokenValue();
         String email = encoderService.decodeBase64(encodedEmail);
-        String token = activationUserData.getToken();
 
-        String activationPath = ActivationConst.ACTIVATION_PATH;
-        String query = String.format("token=%s&email=%s", token, email);
+        String query = String.format("token=%s&email=%s", token, encodedEmail);
 
         URI activationURI = UriComponentsBuilder.fromPath(activationPath)
                 .query(query)
