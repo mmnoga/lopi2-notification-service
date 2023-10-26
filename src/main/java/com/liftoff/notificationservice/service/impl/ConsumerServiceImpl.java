@@ -1,7 +1,9 @@
 package com.liftoff.notificationservice.service.impl;
 
 import com.liftoff.notificationservice.dto.ActivationUserData;
+import com.liftoff.notificationservice.dto.ResetPasswordData;
 import com.liftoff.notificationservice.service.ConsumerService;
+import com.liftoff.notificationservice.service.ResetUserPasswordService;
 import com.liftoff.notificationservice.service.UserActivationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 public class ConsumerServiceImpl implements ConsumerService {
 
     private final UserActivationService userActivationService;
+    private final ResetUserPasswordService resetUserPasswordService;
 
     @Override
     @RabbitListener(queues = {"${user.register.queue.name}"})
@@ -19,5 +22,13 @@ public class ConsumerServiceImpl implements ConsumerService {
         userActivationService
                 .sendActivationLink(activationUserData);
     }
+
+    @Override
+    @RabbitListener(queues = {"${user.resetPassword.queue.name}"})
+    public void consumeResetUserPasswordData(ResetPasswordData resetPasswordData) {
+        resetUserPasswordService
+                .sendResetPasswordLink(resetPasswordData);
+    }
+
 
 }
