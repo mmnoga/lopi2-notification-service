@@ -1,37 +1,69 @@
 package com.liftoff.notificationservice.exception;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class BusinessExceptionTest {
 
-    @Test
-    void shouldReturnBusinessExceptionWithDefaultStatus() {
-        // given
-        String message = "Test message";
+    private GlobalExceptionHandler exceptionHandler;
 
-        // when
-        BusinessException exception = new BusinessException(message);
-
-        // then
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
-        assertEquals(message, exception.getMessage());
+    @BeforeEach
+    public void setUp() {
+        exceptionHandler = new GlobalExceptionHandler();
     }
 
     @Test
-    void shouldReturnBusinessExceptionWithCustomStatus() {
+    void shouldHandleTechnicalException() {
         // given
-        String message = "Test message";
-        HttpStatus customStatus = HttpStatus.BAD_REQUEST;
+        TechnicalException technicalException =
+                new TechnicalException("Test error", HttpStatus.INTERNAL_SERVER_ERROR);
 
         // when
-        BusinessException exception = new BusinessException(message, customStatus);
+        ResponseEntity<Map<String, String>> response =
+                exceptionHandler.handleTechnicalException(technicalException);
 
         // then
-        assertEquals(customStatus, exception.getStatus());
-        assertEquals(message, exception.getMessage());
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        Map<String, String> responseBody = response.getBody();
+        assertEquals("Test error", responseBody.get("message"));
+    }
+
+    @Test
+    void shouldHandleBusinessException() {
+        // given
+        BusinessException businessException =
+                new BusinessException("Test business error", HttpStatus.BAD_REQUEST);
+
+        // when
+        ResponseEntity<Map<String, String>> response =
+                exceptionHandler.handleBusinessException(businessException);
+
+        // then
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        Map<String, String> responseBody = response.getBody();
+        assertEquals("Test business error", responseBody.get("message"));
+    }
+
+    @Test
+    void shouldHandleBusinessExceptionWithoutStatus() {
+        // given
+        BusinessException businessException =
+                new BusinessException("Test business error without status");
+
+        // when
+        ResponseEntity<Map<String, String>> response =
+                exceptionHandler.handleBusinessException(businessException);
+
+        // then
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        Map<String, String> responseBody = response.getBody();
+        assertEquals("Test business error without status", responseBody.get("message"));
     }
 
 }

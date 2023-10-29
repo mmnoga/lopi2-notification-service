@@ -1,6 +1,6 @@
 package com.liftoff.notificationservice.service.impl;
 
-import com.liftoff.notificationservice.dto.ActivationUserData;
+import com.liftoff.notificationservice.dto.ResetPasswordData;
 import com.liftoff.notificationservice.exception.BusinessException;
 import com.liftoff.notificationservice.exception.TechnicalException;
 import com.liftoff.notificationservice.service.EncoderService;
@@ -13,17 +13,16 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.anyString;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class UserActivationServiceImplTest {
+class ResetUserPasswordServiceImplTest {
 
     @InjectMocks
-    private UserActivationServiceImpl userActivationService;
+    private ResetUserPasswordServiceImpl resetUserPasswordService;
 
     @Mock
     private MailService mailService;
@@ -37,41 +36,38 @@ class UserActivationServiceImplTest {
     }
 
     @Test
-    void shouldSendActivationLink() throws Exception {
+    void shouldSendResetPasswordLink() throws Exception {
         // given
-        ActivationUserData activationUserData =
-                new ActivationUserData("encodedEmail", "token");
+        ResetPasswordData resetPasswordData = new ResetPasswordData("encodedEmail", "token");
         String decodedEmail = "test@test.com";
 
-        when(encoderService.decodeBase64(activationUserData.getEncodedUsername())).thenReturn(decodedEmail);
+        when(encoderService.decodeBase64(resetPasswordData.getEncodedUsername())).thenReturn(decodedEmail);
 
         // when
-        userActivationService.sendActivationLink(activationUserData);
+        resetUserPasswordService.sendResetPasswordLink(resetPasswordData);
 
         // then
-        verify(encoderService, times(1))
-                .decodeBase64(activationUserData.getEncodedUsername());
-        verify(mailService, times(1))
-                .sendEmail(eq(decodedEmail), anyString(), anyString());
+        verify(encoderService).decodeBase64(resetPasswordData.getEncodedUsername());
+        verify(mailService).sendEmail(eq(decodedEmail), anyString(), anyString());
     }
 
     @Test
-    void shouldThrowBusinessExceptionWhenActivationUserDataIsNull() {
+    void shouldThrowBusinessExceptionWhenResetPasswordDataIsNull() {
         // when and then
-        assertThrows(BusinessException.class, () -> userActivationService.sendActivationLink(null));
+        assertThrows(BusinessException.class, () -> resetUserPasswordService.sendResetPasswordLink(null));
     }
 
     @Test
     void shouldThrowTechnicalExceptionWhenMessagingExceptionOccurs() throws Exception {
         // given
-        ActivationUserData activationUserData = new ActivationUserData("encodedEmail", "token");
+        ResetPasswordData resetPasswordData = new ResetPasswordData("encodedEmail", "token");
         String decodedEmail = "test@test.com";
-        when(encoderService.decodeBase64(activationUserData.getEncodedUsername())).thenReturn(decodedEmail);
+        when(encoderService.decodeBase64(resetPasswordData.getEncodedUsername())).thenReturn(decodedEmail);
         doThrow(new MessagingException("Test MessagingException"))
                 .when(mailService).sendEmail(eq(decodedEmail), anyString(), anyString());
 
         // when and then
-        assertThrows(TechnicalException.class, () -> userActivationService.sendActivationLink(activationUserData));
+        assertThrows(TechnicalException.class, () -> resetUserPasswordService.sendResetPasswordLink(resetPasswordData));
     }
 
 }
