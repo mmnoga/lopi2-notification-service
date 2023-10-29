@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 @Configuration
 public class RabbitMQConfig {
@@ -31,16 +32,19 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    @Primary
     public Queue queue() {
         return new Queue(queue);
     }
 
     @Bean
+    @Primary
     public TopicExchange exchange() {
         return new TopicExchange(exchange);
     }
 
     @Bean
+    @Primary
     public Binding binding() {
         return BindingBuilder.bind(queue())
                 .to(exchange())
@@ -48,11 +52,13 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    @Primary
     public MessageConverter converter() {
         return new Jackson2JsonMessageConverter();
     }
 
     @Bean
+    @Primary
     public AmqpTemplate amqpTemplate(ConnectionFactory connectionFactory) {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         rabbitTemplate.setMessageConverter(converter());

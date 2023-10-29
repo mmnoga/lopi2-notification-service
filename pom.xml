@@ -40,6 +40,17 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.amqp</groupId>
+            <artifactId>spring-rabbit-test</artifactId>
+            <version>3.0.10</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -92,7 +103,7 @@
                         </executions>
                         <configuration>
                             <excludes>
-                                <exclude>com/liftoff/notificationservice/dto/ActivationUserData.class</exclude>
+                                <exclude>com/liftoff/notificationservice/dto/*.class</exclude>
                             </excludes>
                         </configuration>
                     </plugin>
