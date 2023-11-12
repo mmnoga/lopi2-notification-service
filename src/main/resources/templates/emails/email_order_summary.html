@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pl" xml:lang="pl">
+<head>
+    <title>Order Summary</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: 'Tahoma', sans-serif;
+        }
+
+        a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+
+        .title {
+            background-color: black;
+            text-align: center;
+            font-size: 18px;
+            color: white;
+            margin-top: 10px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 2px solid #000000;
+            padding: 5px;
+            text-align: center;
+        }
+
+        .no-border {
+            border: none;
+        }
+    </style>
+</head>
+<body>
+<p class="title">LOPI2 COFFEE SHOP</p>
+
+<h3>Dziękujemy za zamówienie</h3>
+<p th:if="${deliveryMethod == 'IN_STORE_PICKUP'}">Zapraszamy po odbiór zamówienia do naszego sklepu stacjonarnego.</p>
+<p th:if="${paymentMethod == 'COD'}">Zamówienie opłacisz przy odbiorze.</p>
+<p th:if="${paymentMethod != 'COD'}">Oczekujemy na Twoją płatność.</p>
+
+<h3>Nasze dane bankowe</h3>
+<p>mBank</p>
+<p>Numer konta: 12 0000 0000 0000 0000 0000 0000</p>
+<p>Blik (tel): 123 456 789</p>
+<p>W tytule przelewu wpisz: <strong th:text="${orderNumber}"></strong></p>
+
+<h3 th:text="'Zamówienie ' + ${orderNumber}"></h3>
+<table>
+    <caption>Product List</caption>
+    <thead>
+    <tr>
+        <th><strong>Nazwa</strong></th>
+        <th><strong>Kategoria</strong></th>
+        <th><strong>Ilość</strong></th>
+        <th><strong>Cena za szt.</strong></th>
+        <th><strong>Razem</strong></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="product : ${productList}">
+        <td th:text="${product.productName}"></td>
+        <td th:text="${product.productCategory}"></td>
+        <td th:text="${product.productQuantity}"></td>
+        <td th:text="${product.productPrice}"></td>
+        <td th:text="${product.productTotalPrice}"></td>
+    </tr>
+    </tbody>
+    <tfoot>
+    <tr>
+        <td colspan="3" rowspan="4" class="no-border">&nbsp;</td>
+        <td><strong>Suma</strong></td>
+        <td th:text="${totalProductsPrice}"></td>
+    </tr>
+    <tr>
+        <td><strong>Wysyłka</strong></td>
+        <td th:text="${deliveryMethod}"></td>
+    </tr>
+    <tr>
+        <td><strong>Metoda płatności</strong></td>
+        <td th:text="${paymentMethod}"></td>
+    </tr>
+    <tr>
+        <td><strong>Razem</strong></td>
+        <td th:text="${totalPrice}"></td>
+    </tr>
+    </tfoot>
+</table>
+
+<h3>Adres rozliczeniowy</h3>
+<p th:text="${customerName}"></p>
+<p th:text="${billingStreetAndNumber}"></p>
+<p th:text="${billingPostalCodeAndCity}"></p>
+<p th:text="${phoneNumber}"></p>
+<p th:text="${customerEmail}"></p>
+
+<h3>Adres dostawy</h3>
+<p th:text="${customerName}"></p>
+<p th:text="${deliveryStreetAndNumber}"></p>
+<p th:text="${deliveryPostalCodeAndCity}"></p>
+<p th:text="${phoneNumber}"></p>
+
+<p>Best regards,</p>
+<b>LOPI TEAM</b>
+
+</body>
+</html>

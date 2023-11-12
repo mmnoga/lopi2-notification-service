@@ -7,11 +7,5 @@ public final class ActivationConst {
 
     public static final String ACTIVATION_SUBJECT_TEMPLATE =
             "User Account Activation";
-    public static final String ACTIVATION_BODY_HEADER_TEMPLATE =
-            "<b>LOPI2 COFFEE SHOP</b><br><br>";
-    public static final String ACTIVATION_BODY_TEMPLATE =
-            "To confirm your registration, click on the link below:<br>";
-    public static final String ACTIVATION_BODY_FOOTER_TEMPLATE =
-            "<br><br>Best regards,<br>LOPI TEAM";
 
 }

@@ -1,8 +1,10 @@
 package com.liftoff.notificationservice.service.impl;
 
 import com.liftoff.notificationservice.dto.ActivationUserData;
+import com.liftoff.notificationservice.dto.OrderSummaryData;
 import com.liftoff.notificationservice.dto.ResetPasswordData;
 import com.liftoff.notificationservice.service.ConsumerService;
+import com.liftoff.notificationservice.service.OrderSummaryService;
 import com.liftoff.notificationservice.service.ResetUserPasswordService;
 import com.liftoff.notificationservice.service.UserActivationService;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +17,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 
     private final UserActivationService userActivationService;
     private final ResetUserPasswordService resetUserPasswordService;
+    private final OrderSummaryService orderSummaryService;
 
     @Override
     @RabbitListener(queues = {"${user.register.queue.name}"})
@@ -30,5 +33,11 @@ public class ConsumerServiceImpl implements ConsumerService {
                 .sendResetPasswordLink(resetPasswordData);
     }
 
+    @Override
+    @RabbitListener(queues = {"${order.summary.queue.name}"})
+    public void consumeOrderSummaryData(OrderSummaryData orderSummaryData) {
+        orderSummaryService
+                .sendOrderSummary(orderSummaryData);
+    }
 
 }

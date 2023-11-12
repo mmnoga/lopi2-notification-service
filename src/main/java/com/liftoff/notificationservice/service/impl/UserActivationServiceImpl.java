@@ -12,22 +12,27 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 import java.net.URI;
 
 @Service
 public class UserActivationServiceImpl implements UserActivationService {
 
+    private final TemplateEngine templateEngine;
     private final MailService mailService;
     private final EncoderService encoderService;
     private final String activationLinkBase;
     private final String activationPath;
 
     public UserActivationServiceImpl(
+            TemplateEngine templateEngine,
             MailService mailService,
             EncoderService encoderService,
             @Value("${user.register.activation-link-base}") String activationLinkBase,
             @Value("${user.register.activation-path}") String activationPath) {
+        this.templateEngine = templateEngine;
         this.mailService = mailService;
         this.encoderService = encoderService;
         this.activationLinkBase = activationLinkBase;
@@ -51,12 +56,14 @@ public class UserActivationServiceImpl implements UserActivationService {
                 .query(query)
                 .build()
                 .toUri();
+        String activationLink = activationLinkBase + activationURI;
+        Context context = new Context();
+        context.setVariable("activationLink", activationLink);
 
         String subject = ActivationConst.ACTIVATION_SUBJECT_TEMPLATE;
-        String message = ActivationConst.ACTIVATION_BODY_HEADER_TEMPLATE +
-                ActivationConst.ACTIVATION_BODY_TEMPLATE +
-                activationLinkBase + activationURI +
-                ActivationConst.ACTIVATION_BODY_FOOTER_TEMPLATE;
+
+        String message = templateEngine
+                .process("email_account_activation", context);
 
         try {
             mailService.sendEmail(email, subject, message);

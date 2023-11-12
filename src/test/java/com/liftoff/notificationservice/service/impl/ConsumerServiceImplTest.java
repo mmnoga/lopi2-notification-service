@@ -2,6 +2,7 @@ package com.liftoff.notificationservice.service.impl;
 
 import com.liftoff.notificationservice.dto.ActivationUserData;
 import com.liftoff.notificationservice.dto.ResetPasswordData;
+import com.liftoff.notificationservice.service.OrderSummaryService;
 import com.liftoff.notificationservice.service.ResetUserPasswordService;
 import com.liftoff.notificationservice.service.UserActivationService;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,8 +15,12 @@ class ConsumerServiceImplTest {
 
     @Mock
     private UserActivationService userActivationService;
+
     @Mock
     private ResetUserPasswordService resetUserPasswordService;
+
+    @Mock
+    private OrderSummaryService orderSummaryService;
 
     private ConsumerServiceImpl consumerService;
 
@@ -23,7 +28,10 @@ class ConsumerServiceImplTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
         consumerService =
-                new ConsumerServiceImpl(userActivationService, resetUserPasswordService);
+                new ConsumerServiceImpl(
+                        userActivationService,
+                        resetUserPasswordService,
+                        orderSummaryService);
     }
 
     @Test

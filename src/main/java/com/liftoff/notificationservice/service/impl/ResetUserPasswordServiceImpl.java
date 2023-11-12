@@ -12,21 +12,27 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 import java.net.URI;
 
 @Service
 public class ResetUserPasswordServiceImpl implements ResetUserPasswordService {
 
+    private final TemplateEngine templateEngine;
     private final MailService mailService;
     private final EncoderService encoderService;
     private final String resetLinkBase;
     private final String resetPath;
 
-    public ResetUserPasswordServiceImpl(MailService mailService,
-                                        EncoderService encoderService,
-                                        @Value("${user.resetPassword.link-base}") String resetLinkBase,
-                                        @Value("${user.resetPassword.path}") String resetPath) {
+    public ResetUserPasswordServiceImpl(
+            TemplateEngine templateEngine,
+            MailService mailService,
+            EncoderService encoderService,
+            @Value("${user.resetPassword.link-base}") String resetLinkBase,
+            @Value("${user.resetPassword.path}") String resetPath) {
+        this.templateEngine = templateEngine;
         this.mailService = mailService;
         this.encoderService = encoderService;
         this.resetLinkBase = resetLinkBase;
@@ -46,16 +52,18 @@ public class ResetUserPasswordServiceImpl implements ResetUserPasswordService {
 
         String query = String.format("token=%s&email=%s", token, encodedEmail);
 
-        URI resetnURI = UriComponentsBuilder.fromPath(resetPath)
+        URI resetURI = UriComponentsBuilder.fromPath(resetPath)
                 .query(query)
                 .build()
                 .toUri();
+        String resetLink = resetLinkBase + resetURI;
+        Context context = new Context();
+        context.setVariable("resetLink", resetLink);
 
         String subject = ResetPasswordConst.SUBJECT_TEMPLATE;
-        String message = ResetPasswordConst.BODY_HEADER_TEMPLATE +
-                ResetPasswordConst.BODY_TEMPLATE +
-                resetLinkBase + resetnURI +
-                ResetPasswordConst.BODY_FOOTER_TEMPLATE;
+
+        String message = templateEngine
+                .process("email_reset_password", context);
 
         try {
             mailService.sendEmail(email, subject, message);

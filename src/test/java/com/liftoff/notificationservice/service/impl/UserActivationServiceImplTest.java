@@ -2,19 +2,18 @@ package com.liftoff.notificationservice.service.impl;
 
 import com.liftoff.notificationservice.dto.ActivationUserData;
 import com.liftoff.notificationservice.exception.BusinessException;
-import com.liftoff.notificationservice.exception.TechnicalException;
 import com.liftoff.notificationservice.service.EncoderService;
 import com.liftoff.notificationservice.service.MailService;
-import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -31,6 +30,9 @@ class UserActivationServiceImplTest {
     @Mock
     private EncoderService encoderService;
 
+    @Mock
+    private TemplateEngine templateEngine;
+
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
@@ -39,12 +41,15 @@ class UserActivationServiceImplTest {
     @Test
     void shouldSendActivationLink() throws Exception {
         // given
-        ActivationUserData activationUserData =
-                new ActivationUserData("encodedEmail", "token");
+        ActivationUserData activationUserData = new ActivationUserData("encodedEmail", "token");
         String decodedEmail = "test@test.com";
+        String expectedSubject = "User Account Activation";
+        String expectedMessage = "Your activation message";
 
-        when(encoderService.decodeBase64(activationUserData.getEncodedUsername())).thenReturn(decodedEmail);
-
+        when(encoderService.decodeBase64(activationUserData.getEncodedUsername()))
+                .thenReturn(decodedEmail);
+        when(templateEngine.process(eq("email_account_activation"),
+                any(Context.class))).thenReturn(expectedMessage);
         // when
         userActivationService.sendActivationLink(activationUserData);
 
@@ -52,26 +57,13 @@ class UserActivationServiceImplTest {
         verify(encoderService, times(1))
                 .decodeBase64(activationUserData.getEncodedUsername());
         verify(mailService, times(1))
-                .sendEmail(eq(decodedEmail), anyString(), anyString());
+                .sendEmail(decodedEmail, expectedSubject, expectedMessage);
     }
 
     @Test
     void shouldThrowBusinessExceptionWhenActivationUserDataIsNull() {
         // when and then
         assertThrows(BusinessException.class, () -> userActivationService.sendActivationLink(null));
-    }
-
-    @Test
-    void shouldThrowTechnicalExceptionWhenMessagingExceptionOccurs() throws Exception {
-        // given
-        ActivationUserData activationUserData = new ActivationUserData("encodedEmail", "token");
-        String decodedEmail = "test@test.com";
-        when(encoderService.decodeBase64(activationUserData.getEncodedUsername())).thenReturn(decodedEmail);
-        doThrow(new MessagingException("Test MessagingException"))
-                .when(mailService).sendEmail(eq(decodedEmail), anyString(), anyString());
-
-        // when and then
-        assertThrows(TechnicalException.class, () -> userActivationService.sendActivationLink(activationUserData));
     }
 
 }
