@@ -14,3 +14,5 @@ This project was created with [Java](https://www.java.com) and [Spring Boot](htt
 - **Code Quality:** [SonarQube](https://www.sonarsource.com/products/sonarqube/), [Qodana](https://www.jetbrains.com/qodana/)
 - **Message Queue:** [RabbitMQ](https://www.rabbitmq.com/)
 - **Template Engine:** [Thymeleaf](https://www.thymeleaf.org/)
+
+![Alt text](github/sonar.png "SonarQube Screen")
